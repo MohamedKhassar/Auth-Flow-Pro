@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import bcrypt from "bcryptjs";
 interface User {
     username: string,
     email: string,
@@ -25,5 +25,11 @@ const UserSchema = new mongoose.Schema<User>({
     ]
 })
 
+UserSchema.pre("save", async function () {
+    const salt = bcrypt.genSaltSync()
+    this.password = bcrypt.hashSync(this.password, salt)
+})
+
 const UserModel = mongoose.model<User>("User", UserSchema)
+
 export default UserModel

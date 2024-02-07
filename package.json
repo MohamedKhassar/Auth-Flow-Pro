@@ -7,7 +7,7 @@
   "scripts": {
     "server:dev": "cd server && nodemon",
     "client:dev": "cd client && yarn run dev",
-    "dev": "concurrently \"npm run client:dev\" \"npm run server:dev\""
+    "start": "concurrently \"npm run client:dev\" \"npm run server:dev\""
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

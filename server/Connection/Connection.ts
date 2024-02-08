@@ -1,8 +1,8 @@
 import "dotenv/config";
 import mongoose from "mongoose";
-const DB_URL: any = process.env.DB_URL
+const DB_URL = process.env.DB_URL
 
-mongoose.connect(DB_URL)
+mongoose.connect(DB_URL!)
 
 mongoose.connection.on("connected", () => {
     console.log("Connected to MongoDB")

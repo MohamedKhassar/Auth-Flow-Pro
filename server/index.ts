@@ -9,10 +9,10 @@ const app = express()
 const PORT = process.env.PORT
 
 app.use(express.json())
+app.use(cookieParser())
+app.use(cors())
 app.use("/api", userRouter)
 app.use("/api", RoleRouter)
-app.use(cors())
-app.use(cookieParser())
 app.listen(PORT, () => {
     console.log("Server listening on port " + PORT)
 })

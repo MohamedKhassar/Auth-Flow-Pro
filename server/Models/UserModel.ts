@@ -4,7 +4,7 @@ interface User {
     username: string,
     email: string,
     password: string,
-    roles: mongoose.ObjectId[]
+    role: mongoose.ObjectId
 }
 
 const UserSchema = new mongoose.Schema<User>({
@@ -17,12 +17,13 @@ const UserSchema = new mongoose.Schema<User>({
     password: {
         type: String,
     },
-    roles: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Role"
-        }
-    ]
+    role:
+    {
+        type: mongoose.Schema.Types.ObjectId,
+        default: "65c3941bf83cacbc62afb87e",
+        ref: "Role"
+    }
+
 })
 
 UserSchema.pre("save", async function () {
@@ -30,6 +31,6 @@ UserSchema.pre("save", async function () {
     this.password = bcrypt.hashSync(this.password, salt)
 })
 
-const UserModel = mongoose.model<User>("User", UserSchema)
+const UserModel = mongoose.model("User", UserSchema)
 
 export default UserModel

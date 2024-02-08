@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 interface Role {
     name: string,
-    permissions: mongoose.ObjectId[]
 }
 
 const RoleSchema = new mongoose.Schema<Role>({

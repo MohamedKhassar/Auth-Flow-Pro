@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import "dotenv/config"
 import mongoose from "mongoose";
@@ -11,12 +11,25 @@ export interface CustomJwt extends JwtPayload {
 export interface CustomUser extends User {
     name: string
 }
-
+interface CustomReq extends Request {
+    cookies: {
+        access_token: string
+    }
+}
 export const PerRequire = {
-    isAdmin: async (req: Request, res: Response, next: NextFunction) => {
+    isAdmin: async (req: CustomReq, res: Response, next: NextFunction) => {
         const decode = jwt.decode(req.cookies.access_token) as CustomJwt
         const user = await UserModel.findById(decode.id).populate<{ role: CustomUser }>("role")
         if (user?.role.name == "admin") {
+            next()
+        } else {
+            res.json({ msg: "you're not allowed" })
+        }
+    },
+    isSuperAdmin: async (req: CustomReq, res: Response, next: NextFunction) => {
+        const decode = jwt.decode(req.cookies.access_token) as CustomJwt
+        const user = await UserModel.findById(decode.id).populate<{ role: CustomUser }>("role")
+        if (user?.role.name == "super_admin") {
             next()
         } else {
             res.json({ msg: "you're not allowed" })

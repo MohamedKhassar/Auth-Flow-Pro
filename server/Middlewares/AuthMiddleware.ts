@@ -19,5 +19,4 @@ export const authMiddleware = (req: CustomRequest, res: Response, next: NextFunc
     } else {
         res.status(401).json({ message: "Unauthorized" })
     }
-
 }

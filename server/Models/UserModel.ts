@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-interface User {
+import isEmail from "validator/lib/isEmail";
+import { isStrongPassword } from "validator";
+export interface User {
     username: string,
     email: string,
     password: string,
@@ -10,17 +12,23 @@ interface User {
 const UserSchema = new mongoose.Schema<User>({
     username: {
         type: String,
+        unique: true,
+        required: [true, 'Username is required']
     },
     email: {
         type: String,
+        unique: true,
+        required: [true, 'Email is required'],
+        validate: [isEmail, "Email not valid"],
     },
     password: {
         type: String,
+        validate: [isStrongPassword, "Password not valid"]
     },
     role:
     {
         type: mongoose.Schema.Types.ObjectId,
-        default: "65c3941bf83cacbc62afb87e",
+        default: "65c5f1ce8785bf94e1ad35e8",
         ref: "Role"
     }
 

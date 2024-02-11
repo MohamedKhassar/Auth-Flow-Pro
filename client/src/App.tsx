@@ -15,6 +15,7 @@ function App() {
   useEffect(() => {
     dispatch(getUser());
   }, [dispatch])
+  console.log(user.error)
   return (
     <>
       <div className="p-3">
@@ -24,7 +25,10 @@ function App() {
         {!user.user ?
           <Auth />
           :
-          <Button variant="outline" onClick={() => dispatch(logOut())}>Button</Button>
+          <div>
+            {user.user.username}
+            <Button variant="outline" onClick={() => dispatch(logOut())}>Button</Button>
+          </div>
         }
       </div>
     </>

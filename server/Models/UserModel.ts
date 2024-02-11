@@ -23,6 +23,7 @@ const UserSchema = new mongoose.Schema<User>({
     },
     password: {
         type: String,
+        required: [true, 'Password is required'],
         validate: [isStrongPassword, "Password not valid"]
     },
     role:

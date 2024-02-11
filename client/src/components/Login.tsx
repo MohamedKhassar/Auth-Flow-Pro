@@ -11,7 +11,9 @@ import { AppDispatch } from "./store/store";
 export interface CustomAuth {
     auth: {
         isAuthenticated: boolean;
-        user: null; // Define your user object type
+        user: {
+            username: string
+        } | null // Define your user object type
         status: 'idle' | 'loading' | 'success' | 'error';
         error: string | null;
     };
@@ -23,9 +25,9 @@ export default function Login() {
     const dispatch = useDispatch<AppDispatch>();
     const user = useSelector((state: CustomAuth) => state.auth);
     const [showPassword, setShowPassword] = useState(true)
-    console.log(user)
     const handleSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
         e.preventDefault();
+
         dispatch(loginUser(credentials));
     };
     return (
@@ -40,20 +42,32 @@ export default function Login() {
                 <CardContent className="space-y-2">
                     <div className="space-y-1">
                         <Label htmlFor="Email">Email <b className="text-red-600">*</b></Label>
-                        <Input id="Email" placeholder="PedroDuarte@gmail.com" onChange={(e) => setCredentials({ ...credentials, email: e.target.value })} />
+                        <Input id="Email" placeholder="PedroDuarte@gmail.com" onChange={(e) => setCredentials({ ...credentials, email: e.target.value })} className={`
+                                    
+                                ${user.error?.includes("email not found") && !credentials.email && "border border-red-600"
+                            }
+                                    
+                            `} />
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="password">Password <b className="text-red-600">*</b></Label>
                         <div className="flex gap-x-2">
-                            <Input id="password" placeholder={showPassword ? "*************" : "Your password"} type={showPassword ? "password" : "text"} onChange={(e) => setCredentials({ ...credentials, password: e.target.value })} />
+                            <Input id="password" placeholder={showPassword ? "*************" : "Your password"} type={showPassword ? "password" : "text"} onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                                className={`
+                                    
+                                ${user.error?.includes("Invalid password") && !credentials.password && "border border-red-600"
+                                    }
+                                    
+                            `}
+                            />
                             <Button variant={"secondary"} size={"icon"} onClick={() => setShowPassword(!showPassword)} >
                                 {showPassword ? <Eye size={18} /> :
                                     <EyeOff size={18} />}
                             </Button>
                         </div>
-                        <div className="flex gap-x-2 text-red-600">
+                        <div className="flex gap-x-2 text-red-600 capitalize">
                             {
-                                user.error && user.error
+                                user.error?.includes("email not found") && !credentials.email && "credentials are required" || user.error?.includes("Invalid password") && !credentials.password && "credentials are required" || user.error?.includes("Invalid password") && user.error || user.error?.includes("email not found") && user.error
                             }
                         </div>
                     </div>

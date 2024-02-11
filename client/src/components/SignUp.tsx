@@ -32,16 +32,22 @@ const SignUp = () => {
                 <CardContent className="space-y-2">
                     <div className="space-y-1">
                         <Label htmlFor="Username">Username <b className="text-red-600">*</b></Label>
-                        <Input id="Username" placeholder="Pedro_Duarte_26" onChange={(e) => { setCredentials({ ...credentials, username: e.target.value }) }} />
+                        <Input id="Username" placeholder="Pedro_Duarte_26" onChange={(e) => { setCredentials({ ...credentials, username: e.target.value }) }} className={`
+                                ${user.error?.includes("username") && "border border-red-700"}`
+                        } />
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="Email">Email <b className="text-red-600">*</b></Label>
-                        <Input id="Email" placeholder="PedroDuarte@gmail.com" onChange={(e) => { setCredentials({ ...credentials, email: e.target.value }) }} />
+                        <Input id="Email" placeholder="PedroDuarte@gmail.com" onChange={(e) => { setCredentials({ ...credentials, email: e.target.value }) }} className={`
+                                ${user.error?.includes("email") && "border border-red-700"}`
+                        } />
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="password">Password <b className="text-red-600">*</b></Label>
                         <div className="flex gap-x-2">
-                            <Input id="password" placeholder={showPassword ? "*************" : "Your password"} type={showPassword ? "password" : "text"} onChange={(e) => { setCredentials({ ...credentials, password: e.target.value }) }} />
+                            <Input id="password" placeholder={showPassword ? "*************" : "Your password"} type={showPassword ? "password" : "text"} onChange={(e) => { setCredentials({ ...credentials, password: e.target.value }) }} className={`
+                                ${user.error?.includes("password") && "border border-red-700"}`
+                            } />
                             <Button variant={"secondary"} size={"icon"} onClick={() => setShowPassword(!showPassword)} >
                                 {showPassword ? <Eye size={18} /> :
                                     <EyeOff size={18} />}

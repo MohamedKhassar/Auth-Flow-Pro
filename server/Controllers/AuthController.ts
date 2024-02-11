@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs"
 import RoleModel from "../Models/RoleModel"
 import { handelError } from "../Error/handelError"
 import { CustomUser } from "../Middlewares/PermissionMiddleware"
+import { read } from "fs"
 const JWT_SECRET: any = process.env.JWT_SECRET
 const createToken = (id: mongoose.Types.ObjectId) => {
     const token = jwt.sign({ id }, JWT_SECRET, {
@@ -22,7 +23,7 @@ export const signUp = async (req: Request, res: Response) => {
             res.status(400).json({ message: "User already exists" })
         } else {
             const user = await UserModel.create(req.body)
-            const role =await RoleModel.findById(user.role)
+            const role = await RoleModel.findById(user.role)
             const token = createToken(user._id)
             res.cookie("token", token, { maxAge: 60 * 60 * 24 * 1000 })
             res.status(201).json({ message: "User created", username: user.username, email, role: role?.name, token })
@@ -52,7 +53,8 @@ export const signIn = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "email not found" })
         }
     } catch (error) {
-        console.log(error)
+        const err = handelError(error)
+        res.status(400).json(err)
     }
 }
 
@@ -71,12 +73,12 @@ export const getUser = async (req: Request, res: Response) => {
         const { token }: any = req.query
         const decode: any = jwt.decode(token)
         const user = await UserModel.findById(decode!.id, { __v: 0, password: 0 }).populate<{ role: CustomUser }>("role")
-        console.log(user)
-        res.status(200).json(user)
+        if (user) {
+            res.status(200).json({ email: user?.email, username: user?.username, role: user?.role.name })
+        }
 
     } catch (error) {
         const err = handelError(error)
-        console.log("token")
         res.json(err)
 
     }

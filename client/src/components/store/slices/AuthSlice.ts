@@ -4,16 +4,16 @@ import Cookies from "universal-cookie";
 
 
 interface AuthState {
-    isAuthenticated: boolean;
     user: null // Define your user object type
-    status: 'idle' | 'loading' | 'success' | 'error';
     error: string | null | undefined;
 }
 
+interface CustomError extends Error {
+    response?: AxiosResponse
+}
+
 const initialState: AuthState = {
-    isAuthenticated: false,
     user: null,
-    status: 'idle',
     error: null,
 };
 
@@ -26,7 +26,11 @@ export const loginUser = createAsyncThunk(
             cookies.set("token", res.data.token)
             return res.data;
         } catch (error) {
-            throw Error('An error occurred during login');
+            const err = error as CustomError
+            throw Error(err.response?.data["message"])
+
+
+
         }
     }
 );
@@ -39,9 +43,20 @@ export const signUp = createAsyncThunk(
             cookies.set("token", res.data.token)
             return res.data;
         } catch (error) {
-            console.log(credentials)
-            console.log(error)
-            throw Error('An error occurred during signup');
+            const err = error as CustomError
+            console.log(err.response?.data)
+            if (err.response?.data["username"]) {
+                throw Error(err.response?.data["username"])
+            }
+            else if (err.response?.data["email"]) {
+                throw Error(err.response?.data["email"])
+            }
+            else if (err.response?.data["password"]) {
+                throw Error(err.response?.data["password"])
+            } else {
+                throw Error(err.response?.data["message"])
+            }
+
         }
     }
 );
@@ -56,7 +71,8 @@ export const getUser = createAsyncThunk(
                 return res.data;
             }
         } catch (error) {
-            throw Error('An error occurred during check user');
+            const err = error as CustomError
+            throw Error(err.response?.data);
         }
     }
 );
@@ -68,10 +84,13 @@ export const logOut = createAsyncThunk(
             cookies.remove("token")
             // await axios.get(`http://localhost:8080/api/logout`);
         } catch (error) {
-            throw Error('An error occurred during check user');
+            const err = error as CustomError
+
+            throw Error(err.response?.data);
         }
     }
 );
+
 
 
 
@@ -80,53 +99,40 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
+        clearError: (state) => {
+            state.error = null
+            return state
+        }
     },
     extraReducers(builder) {
         builder
             .addCase(loginUser.pending, (state) => {
-                state.status = 'loading';
                 state.error = null;
             })
             .addCase(loginUser.fulfilled, (state, action) => {
-                state.status = 'success';
                 state.user = action.payload;
-                state.isAuthenticated = true;
+
             })
             .addCase(loginUser.rejected, (state, action) => {
-                state.status = 'error';
                 state.error = action.error.message;
             })
-        builder.addCase(getUser.pending, (state) => {
-            state.status = 'loading';
+        builder.addCase(getUser.fulfilled, (state, action) => {
+            state.user = action.payload;
         })
-            .addCase(getUser.fulfilled, (state, action) => {
-                state.status = 'success';
-                state.user = action.payload;
-            })
             .addCase(getUser.rejected, (state, action) => {
-                state.status = 'error';
                 state.error = action.error.message;
             })
-        builder.addCase(logOut.pending, (state) => {
-            state.status = 'loading';
+        builder.addCase(logOut.fulfilled, (state) => {
+            state.user = null;
         })
-            .addCase(logOut.fulfilled, (state) => {
-                state.status = 'success';
-                state.user = null;
-            })
             .addCase(logOut.rejected, (state, action) => {
-                state.status = 'error';
                 state.error = action.error.message;
             })
-        builder.addCase(signUp.pending, (state) => {
-            state.status = 'loading';
+        builder.addCase(signUp.fulfilled, (state, action) => {
+            state.user = action.payload;
         })
-            .addCase(signUp.fulfilled, (state, action) => {
-                state.status = 'success';
-                state.user = action.payload;
-            })
             .addCase(signUp.rejected, (state, action) => {
-                state.status = 'error';
+
                 state.error = action.error.message;
             })
 
@@ -138,5 +144,5 @@ const authSlice = createSlice({
 })
 
 
-
+export const { clearError } = authSlice.actions
 export default authSlice.reducer;

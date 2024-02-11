@@ -3,12 +3,11 @@ interface CustomError extends Error {
 }
 export const handelError = (err: any) => {
     let error: any = {}
-    console.log(err)
     if (err.code == 11000) {
         if (err.message.includes('username')) {
-            error["username"] = "this key is duplicated"
+            error["username"] = "username is duplicated"
         } else if (err.message.includes("email")) {
-            error["email"] = "this key is duplicated"
+            error["email"] = "email is duplicated"
 
         }
     }

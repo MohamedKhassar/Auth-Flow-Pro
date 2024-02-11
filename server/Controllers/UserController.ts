@@ -3,7 +3,6 @@ import UserModel from "../Models/UserModel";
 import { handelError } from "../Error/handelError";
 import RoleModel from "../Models/RoleModel";
 import { CustomUser } from "../Middlewares/PermissionMiddleware";
-
 export const updateUserRole = async (req: Request, res: Response) => {
     const { id } = req.params
     const { name } = req.body

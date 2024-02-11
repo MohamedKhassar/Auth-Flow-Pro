@@ -1,29 +1,33 @@
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-import Login from "./components/Login"
-import SignUp from "./components/SignUp"
-import { ThemeProvider } from "./components/theme-provider"
 import { ModeToggle } from "./components/mode-toggle"
+import { ThemeProvider } from "./components/theme-provider"
+import { Auth } from "./components/Auth";
+import { useEffect } from "react";
+import { AppDispatch } from "./components/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { CustomAuth } from "./components/Login";
+import { getUser, logOut } from "./components/store/slices/AuthSlice";
+import { Button } from "./components/ui/button";
+
 function App() {
+
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: CustomAuth) => state.auth);
+  useEffect(() => {
+    dispatch(getUser());
+  }, [dispatch])
   return (
-    <div className="p-3">
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <ModeToggle />
-      </ThemeProvider>
-      <div className="flex justify-center h-screen items-center">
-        <Tabs defaultValue="login" className="w-[400px]">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="password">Password</TabsTrigger>
-          </TabsList>
-          <Login />
-          <SignUp />
-        </Tabs>
+    <>
+      <div className="p-3">
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <ModeToggle />
+        </ThemeProvider>
+        {!user.user ?
+          <Auth />
+          :
+          <Button variant="outline" onClick={() => dispatch(logOut())}>Button</Button>
+        }
       </div>
-    </div>
+    </>
   )
 }
 

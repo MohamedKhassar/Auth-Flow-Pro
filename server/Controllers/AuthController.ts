@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken"
+import jwt, { JwtPayload } from "jsonwebtoken"
 import mongoose from "mongoose"
 import "dotenv/config"
 import { Request, Response } from "express"
@@ -21,10 +21,11 @@ export const signUp = async (req: Request, res: Response) => {
         if (user) {
             res.status(400).json({ message: "User already exists" })
         } else {
-            const user = await (await UserModel.create(req.body)).populate<{ role: CustomUser }>("role")
+            const user = await UserModel.create(req.body)
+            const role =await RoleModel.findById(user.role)
             const token = createToken(user._id)
-            res.cookie("access_token", token, { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 })
-            res.status(201).json({ message: "User created", username: user.username, email, role: user.role.name, token })
+            res.cookie("token", token, { maxAge: 60 * 60 * 24 * 1000 })
+            res.status(201).json({ message: "User created", username: user.username, email, role: role?.name, token })
         }
     } catch (error: any) {
         const errorMessage = handelError(error)
@@ -40,7 +41,7 @@ export const signIn = async (req: Request, res: Response) => {
             const isPassword = bcrypt.compareSync(password, user.password)
             if (isPassword) {
                 const token = createToken(user._id)
-                res.cookie("access_token", token, { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 })
+                res.cookie("token", token, { maxAge: 60 * 60 * 24 * 1000 })
                 res.status(200).json({ username: user.username, email, role: user.role?.name, token })
             }
             else {
@@ -57,7 +58,7 @@ export const signIn = async (req: Request, res: Response) => {
 
 export const logOut = (req: Request, res: Response) => {
     try {
-        res.clearCookie("access_token")
+        res.clearCookie("token")
         res.status(200).json({ message: "Logged out" })
     } catch (error) {
         console.log(error)
@@ -65,3 +66,18 @@ export const logOut = (req: Request, res: Response) => {
 }
 
 
+export const getUser = async (req: Request, res: Response) => {
+    try {
+        const { token }: any = req.query
+        const decode: any = jwt.decode(token)
+        const user = await UserModel.findById(decode!.id, { __v: 0, password: 0 }).populate<{ role: CustomUser }>("role")
+        console.log(user)
+        res.status(200).json(user)
+
+    } catch (error) {
+        const err = handelError(error)
+        console.log("token")
+        res.json(err)
+
+    }
+}

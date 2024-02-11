@@ -9,7 +9,7 @@ export interface CustomJwt extends JwtPayload {
 }
 
 export interface CustomUser extends User {
-    name: string
+        name: string
 }
 interface CustomReq extends Request {
     cookies: {

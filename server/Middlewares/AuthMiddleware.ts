@@ -6,9 +6,9 @@ interface CustomRequest extends Request {
     decoded?: string
 }
 export const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction) => {
-    const { access_token } = req.cookies || undefined
-    if (access_token) {
-        jwt.verify(access_token, JWT_SECRET!, (err: any, decoded: any) => {
+    const { token } = req.cookies || undefined
+    if (token) {
+        jwt.verify(token, JWT_SECRET!, (err: any, decoded: any) => {
             if (err) {
                 res.status(401).json({ message: "Unauthorized" })
             } else {

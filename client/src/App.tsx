@@ -1,12 +1,10 @@
-import { ModeToggle } from "./components/mode-toggle"
-import { ThemeProvider } from "./components/theme-provider"
 import { Auth } from "./components/Auth";
 import { useEffect } from "react";
 import { AppDispatch } from "./components/store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { CustomAuth } from "./components/Login";
-import { getUser, logOut } from "./components/store/slices/AuthSlice";
-import { Button } from "./components/ui/button";
+import { getUser } from "./components/store/slices/AuthSlice";
+import { NavBar } from "./components/NavBar";
 
 function App() {
 
@@ -15,21 +13,11 @@ function App() {
   useEffect(() => {
     dispatch(getUser());
   }, [dispatch])
-  console.log(user.error)
   return (
     <>
       <div className="p-3">
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <ModeToggle />
-        </ThemeProvider>
-        {!user.user ?
-          <Auth />
-          :
-          <div>
-            {user.user.username}
-            <Button variant="outline" onClick={() => dispatch(logOut())}>Button</Button>
-          </div>
-        }
+        <NavBar />
+        {!user.user && <Auth />}
       </div>
     </>
   )

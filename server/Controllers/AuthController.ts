@@ -16,13 +16,15 @@ const createToken = (id: mongoose.Types.ObjectId) => {
     return token
 }
 export const signUp = async (req: Request, res: Response) => {
-    const { username, email, password } = req.body
+    const { username, email, role } = req.body
     const user = await UserModel.findOne({ email, username })
     try {
         if (user) {
             res.status(400).json({ message: "User already exists" })
         } else {
-            const user = await UserModel.create(req.body)
+            if (role) {
+                const user = await UserModel.create(req.body)
+            }
             const role = await RoleModel.findById(user.role)
             const token = createToken(user._id)
             res.cookie("token", token, { maxAge: 60 * 60 * 24 * 1000 })

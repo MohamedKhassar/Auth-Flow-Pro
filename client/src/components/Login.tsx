@@ -12,6 +12,8 @@ export interface CustomAuth {
     auth: {
         isAuthenticated: boolean;
         user: {
+            email: string,
+            role: string
             username: string
         } | null // Define your user object type
         status: 'idle' | 'loading' | 'success' | 'error';

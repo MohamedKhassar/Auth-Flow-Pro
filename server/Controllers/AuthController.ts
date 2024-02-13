@@ -22,12 +22,10 @@ export const signUp = async (req: Request, res: Response) => {
         if (user) {
             res.status(400).json({ message: "User already exists" })
         } else {
-            if (role) {
-                const user = await UserModel.create(req.body)
-            }
+
+            const user = await UserModel.create(req.body)
             const role = await RoleModel.findById(user.role)
             const token = createToken(user._id)
-            res.cookie("token", token, { maxAge: 60 * 60 * 24 * 1000 })
             res.status(201).json({ message: "User created", username: user.username, email, role: role?.name, token })
         }
     } catch (error: any) {
@@ -44,7 +42,6 @@ export const signIn = async (req: Request, res: Response) => {
             const isPassword = bcrypt.compareSync(password, user.password)
             if (isPassword) {
                 const token = createToken(user._id)
-                res.cookie("token", token, { maxAge: 60 * 60 * 24 * 1000 })
                 res.status(200).json({ username: user.username, email, role: user.role?.name, token })
             }
             else {
@@ -62,7 +59,6 @@ export const signIn = async (req: Request, res: Response) => {
 
 export const logOut = (req: Request, res: Response) => {
     try {
-        res.clearCookie("token")
         res.status(200).json({ message: "Logged out" })
     } catch (error) {
         console.log(error)
@@ -72,12 +68,15 @@ export const logOut = (req: Request, res: Response) => {
 
 export const getUser = async (req: Request, res: Response) => {
     try {
-        const { token }: any = req.query
-        const decode: any = jwt.decode(token)
-        const user = await UserModel.findById(decode!.id, { __v: 0, password: 0 }).populate<{ role: CustomUser }>("role")
-        if (user) {
-            res.status(200).json({ email: user?.email, username: user?.username, role: user?.role.name })
+        const token: any = req.headers.authorization?.split(" ")[1] || undefined
+        if (token) {
+            const decode: any = jwt.decode(token)
+            const user = await UserModel.findById(decode!.id, { __v: 0, password: 0 }).populate<{ role: CustomUser }>("role")
+            if (user) {
+                res.status(200).json({ email: user?.email, username: user?.username, role: user?.role.name })
+            }
         }
+
 
     } catch (error) {
         const err = handelError(error)

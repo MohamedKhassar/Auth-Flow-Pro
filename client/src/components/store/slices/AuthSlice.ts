@@ -1,3 +1,4 @@
+import api from "@/config";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "universal-cookie";
@@ -64,12 +65,11 @@ export const getUser = createAsyncThunk(
     'auth/getUser',
     async () => {
         try {
-            const cookies = new Cookies()
-            const token = cookies.get("token")
-            if (token) {
-                const res: AxiosResponse = await axios.get(`http://localhost:8080/api/getUser?token=${token}`);
-                return res.data;
-            }
+            const res: AxiosResponse = await api.get(`/api/getUser`)
+            console.log(res)
+            return res.data;
+
+
         } catch (error) {
             const err = error as CustomError
             throw Error(err.response?.data);
@@ -81,8 +81,8 @@ export const logOut = createAsyncThunk(
     async () => {
         try {
             const cookies = new Cookies()
+            await api.get(`/api/logout`);
             cookies.remove("token")
-            // await axios.get(`http://localhost:8080/api/logout`);
         } catch (error) {
             const err = error as CustomError
 

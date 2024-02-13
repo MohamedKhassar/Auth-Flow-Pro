@@ -5,6 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { CustomAuth } from "./components/Login";
 import { getUser } from "./components/store/slices/AuthSlice";
 import { NavBar } from "./components/NavBar";
+import { Route, Routes } from "react-router-dom";
+import Admin from "./components/Admin";
+import User from "./components/User";
+import SuperAdmin from "./components/SuperAdmin";
 
 function App() {
 
@@ -12,13 +16,19 @@ function App() {
   const user = useSelector((state: CustomAuth) => state.auth);
   useEffect(() => {
     dispatch(getUser());
-  }, [dispatch])
+  }, [dispatch]) 
+  
+  console.log(user.user?.role)
   return (
     <>
       <div className="p-3">
         <NavBar />
-        {!user.user && <Auth />}
       </div>
+      {!user.user ? <Auth /> :
+        <Routes>
+          <Route path="/" element={user.user.role == "admin" ? <Admin /> : user.user.role == "user" ? <User /> : <SuperAdmin />} />
+        </Routes>
+      }
     </>
   )
 }

@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
-import UserModel from "../Models/UserModel";
+import UserModel, { User } from "../Models/UserModel";
 import { handelError } from "../Error/handelError";
 import RoleModel from "../Models/RoleModel";
 import { CustomUser } from "../Middlewares/PermissionMiddleware";
+import jwt from "jsonwebtoken"
+import { CustomRequest } from "../Middlewares/AuthMiddleware";
 export const updateUserRole = async (req: Request, res: Response) => {
     const { id } = req.params
     const { name } = req.body
@@ -30,6 +32,22 @@ export const updateUser = async (req: Request, res: Response) => {
     try {
         const user = await UserModel.findByIdAndUpdate(id, req.body, { new: true }).populate<{ role: CustomUser }>("role")
         res.status(200).json({ message: "User updated", username: user?.username, email: user?.email, role: user?.role.name })
+    } catch (error) {
+        const err = handelError(error)
+        res.status(400).json(err)
+    }
+}
+export const getUsers = async (req: CustomRequest, res: Response) => {
+    try {
+        const token: any = req.headers.authorization?.split(" ")[1] || undefined
+        const decode: any = jwt.decode(token)
+        const users = await UserModel.find({ _id: decode!.id }, { __v: 0, password: 0 }).populate<{ role: CustomUser }>("role")
+        const user = users[0];
+
+        if (user) {
+            res.status(200).json({ email: user?.email, username: user?.username, role: user?.role.name });
+        }
+
     } catch (error) {
         const err = handelError(error)
         res.status(400).json(err)

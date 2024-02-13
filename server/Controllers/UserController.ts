@@ -41,15 +41,15 @@ export const getUsers = async (req: CustomRequest, res: Response) => {
     try {
         const token: any = req.headers.authorization?.split(" ")[1] || undefined
         const decode: any = jwt.decode(token)
-        const users = await UserModel.find({ _id: decode!.id }, { __v: 0, password: 0 }).populate<{ role: CustomUser }>("role")
-        const user = users[0];
+        console.log(decode.id)
+        const users = await UserModel.find({ _id: { $ne: decode.id } }, { __v: 0, password: 0 }).populate<{ role: CustomUser }>("role")
 
-        if (user) {
-            res.status(200).json({ email: user?.email, username: user?.username, role: user?.role.name });
-        }
+        res.status(200).json(users);
+
 
     } catch (error) {
         const err = handelError(error)
         res.status(400).json(err)
     }
 }
+

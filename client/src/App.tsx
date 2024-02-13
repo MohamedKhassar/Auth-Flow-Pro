@@ -8,7 +8,6 @@ import { NavBar } from "./components/NavBar";
 import { Route, Routes } from "react-router-dom";
 import Admin from "./components/Admin";
 import User from "./components/User";
-import SuperAdmin from "./components/SuperAdmin";
 
 function App() {
 
@@ -16,8 +15,8 @@ function App() {
   const user = useSelector((state: CustomAuth) => state.auth);
   useEffect(() => {
     dispatch(getUser());
-  }, [dispatch]) 
-  
+  }, [dispatch])
+
   console.log(user.user?.role)
   return (
     <>
@@ -26,7 +25,7 @@ function App() {
       </div>
       {!user.user ? <Auth /> :
         <Routes>
-          <Route path="/" element={user.user.role == "admin" ? <Admin /> : user.user.role == "user" ? <User /> : <SuperAdmin />} />
+          <Route path="/" element={user.user.role == "user" ? <User /> : <Admin />} />
         </Routes>
       }
     </>

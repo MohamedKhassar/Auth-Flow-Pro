@@ -4,10 +4,6 @@
     "client",
     "server"
   ],
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node"
-  },
   "scripts": {
     "server:dev": "cd server && nodemon",
     "client:dev": "cd client && yarn run dev",

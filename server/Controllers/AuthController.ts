@@ -7,7 +7,6 @@ import bcrypt from "bcryptjs"
 import RoleModel from "../Models/RoleModel"
 import { handelError } from "../Error/handelError"
 import { CustomUser } from "../Middlewares/PermissionMiddleware"
-import { read } from "fs"
 const JWT_SECRET: any = process.env.JWT_SECRET
 const createToken = (id: mongoose.Types.ObjectId) => {
     const token = jwt.sign({ id }, JWT_SECRET, {

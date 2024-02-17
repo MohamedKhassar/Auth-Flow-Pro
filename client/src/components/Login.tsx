@@ -10,7 +10,6 @@ import { loginUser } from "./store/slices/AuthSlice";
 import { AppDispatch } from "./store/store";
 export interface CustomAuth {
     auth: {
-        isAuthenticated: boolean;
         user: {
             email: string,
             role: string

@@ -1,30 +1,70 @@
 import { Request, Response } from 'express';
-import UserModel from '../Models/UserModel';
-import RoleModel from '../Models/RoleModel';
-import jwt from 'jsonwebtoken';
-import { signUp } from '../Controllers/AuthController';
+import { signIn } from '../Controllers/AuthController';
 
-jest.mock('../Models/UserModel');
-jest.mock('bcryptjs');
-jest.mock('jsonwebtoken');
+describe('signIn function', () => {
+    test('should sign in a user with valid credentials', async () => {
+        // Mock request object
+        const req: Request = {
+            body: {
+                email: 'test@example.com',
+                password: 'testpassword123',
+            },
+        } as Request;
 
-describe('userController', () => {
-    describe('signUp', () => {
-        test('should create a new user', async () => {
-            const req: Partial<Request> = { body: { username: 'testUser', email: 'test@example.com', role: 'roleId' } };
-            const res: Partial<Response> = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+        // Mock response object
+        const res: Response<any, Record<string, any>> = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        } as unknown as Response<any, Record<string, any>>;
 
-            (UserModel.findOne as jest.Mock).mockResolvedValue(null);
-            (UserModel.create as jest.Mock).mockResolvedValue({ _id: 'userId', username: 'testUser', email: 'test@example.com', role: 'roleId' });
-            await signUp(req as Request, res as Response);
+        // Mock UserModel.findOne to return a user with matching email and password
+        jest.mock('../Models/UserModel', () => ({
+            findOne: jest.fn().mockResolvedValueOnce({
+                email: 'test@example.com',
+                password: 'hashedPassword', // Assuming password is already hashed
+            }),
+        }));
 
-            expect(UserModel.findOne).toHaveBeenCalledWith({ email: 'test@example.com', username: 'testUser' });
-            expect(UserModel.create).toHaveBeenCalledWith({ username: 'testUser', email: 'test@example.com', role: 'roleId' });
-            expect(jwt.sign).toHaveBeenCalledWith({ id: 'userId' }, expect.any(String), { expiresIn: '1d' });
-            expect(res.status).toHaveBeenCalledWith(201);
-            expect(res.json).toHaveBeenCalledWith({ message: 'User created', username: 'testUser', email: 'test@example.com', role: 'roleName', token: 'fakeToken' });
-        });
+        await signIn(req, res);
+
+        // Expect status 200 and response with user details and token
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(
+            expect.objectContaining({
+                username: expect.any(String),
+                email: 'test@example.com',
+                role: expect.any(String),
+                token: expect.any(String),
+            })
+        );
     });
 
-    // Add similar test blocks for other functions (signIn, logOut, getUser)...
+    test('should return error for invalid credentials', async () => {
+        // Mock request object
+        const req: Request = {
+            body: {
+                email: 'test@example.com',
+                password: 'invalidpassword',
+            },
+        } as Request;
+
+        // Mock response object
+        const res: Response = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+        } as unknown as Response;
+
+        // Mock UserModel.findOne to return null (no user found)
+        jest.mock('../Models/UserModel', () => ({
+            findOne: jest.fn().mockResolvedValueOnce(null),
+        }));
+
+        await signIn(req, res);
+
+        // Expect status 400 and error message
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+            message: 'email not found',
+        });
+    });
 });

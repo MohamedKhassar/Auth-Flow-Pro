@@ -15,17 +15,22 @@ const createToken = (id: mongoose.Types.ObjectId) => {
     return token
 }
 export const signUp = async (req: Request, res: Response) => {
-    const { username, email, role } = req.body
+    const { username, email, role, password } = req.body
     const user = await UserModel.findOne({ email, username })
+    var role_id: any;
     try {
         if (user) {
             res.status(400).json({ message: "User already exists" })
         } else {
-
-            const user = await UserModel.create(req.body)
-            const role = await RoleModel.findById(user.role)
+            if (!role) {
+                role_id = await RoleModel.findOne({ name: "user" })
+            } else {
+                role_id = role
+            }
+            const user = await UserModel.create({ username, email, password, role: role_id._id })
+            const role_name = await RoleModel.findById(user.role)
             const token = createToken(user._id)
-            res.status(201).json({ message: "User created", username: user.username, email, role: role?.name, token })
+            res.status(201).json({ message: "User created", username: user.username, email, role: role_name?.name, token })
         }
     } catch (error: any) {
         const errorMessage = handelError(error)

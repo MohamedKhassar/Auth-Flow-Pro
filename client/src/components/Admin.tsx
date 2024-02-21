@@ -33,7 +33,7 @@ const Admin = () => {
     console.log(users)
     return (
         <div className="flex justify-center items-center h-screen p-10 w-full">
-            {users.length > 0 &&
+            {users.length > 0 ?
                 <Table className="w-full ">
                     <TableHeader className="text-center capitalize">
                         <TableRow>
@@ -55,7 +55,9 @@ const Admin = () => {
                             </TableRow>
                         )}
                     </TableBody>
-                </Table>}
+                </Table> : <div className="flex items-center justify-center h-96">
+                    <h1 className="text-8xl text-red-500 border border-gray-600 p-8 rounded-md bg-slate-800 text-center capitalize">nothing found</h1>
+                </div>}
         </div>
     )
 }

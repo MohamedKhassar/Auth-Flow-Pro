@@ -15,7 +15,7 @@ export const NavBar = () => {
     const user = useSelector((state: CustomAuth) => state.auth);
     const dispatch = useDispatch<AppDispatch>()
     return (
-        <div className='flex justify-between items-center p-4'>
+        <div className='flex justify-between items-center p-4 sticky'>
             <div className='flex gap-x-4 items-center'>
                 <Fingerprint size={50} />
                 <div className='capitalize font-medium text-3xl'>
